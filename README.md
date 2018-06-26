@@ -1,2 +1,2 @@
 # AStar
-A* Search Algorithm
+This is a Java implementation of the A* Search Algorithm for pathfinding.
