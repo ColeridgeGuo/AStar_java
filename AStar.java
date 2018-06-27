@@ -5,39 +5,37 @@ public class AStar {
   public static void main(String[] args){
 
     //initialize the graph
-    Node nodeA = new Node("A", 32, -82);
-    Node nodeB = new Node("B", 32, -82);
-    Node nodeC = new Node("C", 32, -82);
-    Node nodeD = new Node("D", 32, -82);
-    Node nodeE = new Node("E", 32, -82);
+    Node nodeA = new Node("A", 34.92403214, -82.43865505);
+    Node nodeB = new Node("B", 34.92393383, -82.43849192);
+    Node nodeC = new Node("C", 34.9238696, -82.43839111);
+    Node nodeD = new Node("D", 34.92369055, -82.4380996);
+    Node nodeE = new Node("E", 34.92359738, -82.43819648);
+    Node nodeF = new Node("F", 34.92386961, -82.43774778);
 
     //initialize the edges
-    //A
     nodeA.adjacencies = new Edge[]{
-            new Edge(nodeB,10),
-            new Edge(nodeD,100)
+            new Edge(nodeB, nodeA.findDistance(nodeB)),
+            new Edge(nodeF, nodeA.findDistance(nodeF))
     };
-    //B
     nodeB.adjacencies = new Edge[]{
-            new Edge(nodeA,10),
-            new Edge(nodeC,10)
+            new Edge(nodeA, nodeB.findDistance(nodeA)),
+            new Edge(nodeC, nodeB.findDistance(nodeC))
     };
-    //C
     nodeC.adjacencies = new Edge[]{
-            new Edge(nodeB,10),
-            new Edge(nodeD,10),
-            new Edge(nodeE, 30)
+            new Edge(nodeB, nodeC.findDistance(nodeB)),
+            new Edge(nodeD, nodeC.findDistance(nodeD))
     };
-    //D
     nodeD.adjacencies = new Edge[]{
-            new Edge(nodeA,100),
-            new Edge(nodeE,10),
-            new Edge(nodeC,10),
+            new Edge(nodeE, nodeD.findDistance(nodeE)),
+            new Edge(nodeC, nodeD.findDistance(nodeC))
     };
-    //E
     nodeE.adjacencies = new Edge[]{
-            new Edge(nodeD,10),
-            new Edge(nodeC,30)
+            new Edge(nodeD, nodeE.findDistance(nodeD)),
+            new Edge(nodeF, nodeE.findDistance(nodeF))
+    };
+    nodeF.adjacencies = new Edge[]{
+            new Edge(nodeA, nodeF.findDistance(nodeA)),
+            new Edge(nodeE, nodeF.findDistance(nodeE))
     };
 
     AStarSearch(nodeA,nodeE);
@@ -71,8 +69,8 @@ public class AStar {
       }
     }
     );
-    source.setG(0);
-    source.setF(0);
+    //source.setG(0);
+    //source.setF(0);
     openList.add(source);
 
     // While the openList is not empty and not GOOOOOOOOOAL
@@ -81,38 +79,39 @@ public class AStar {
       // Remove the node with the minimum f on the openList
       Node pq = openList.poll();
 
-      // Put pq on the closedList
-      closedList.add(pq);
-
-      // If goal found
-      if(pq.getNodeID().equals(goal.getNodeID())){
-        found = true;
-      }
-
-      // Check every child of pq node
+      // Check every successor of pq node
       for(Edge e : pq.adjacencies){
-        Node child = e.target;
-        double cost = e.cost;
-        double temp_g = pq.getG() + cost;
-        double temp_f = temp_g + child.getH();
+        Node successor = e.getTarget();
+        successor.setParent(pq);
+        // If goal found
+        if(successor.getNodeID().equals(goal.getNodeID())){
+          found = true;
+          goal = successor;
+        }
 
-        // If successor is in the openList and the newer f is higher, skip
-        if((closedList.contains(child)) && (temp_f >= child.getF())){
+        double temp_g = pq.getG() + e.getCost();
+        if (successor.getH() == -1){
+          successor.setH(goal);
+        }
+        double temp_f = temp_g + successor.getH();
+
+        // If successor is in the openList and that node's f < successor.f, skip
+        if((openList.contains(successor)) && (temp_f <= successor.getF())){
           continue;
         }
 
-        // Else if successor is in the closedList or newer f is lower
-        else if((!openList.contains(child)) || (temp_f < child.getF())){
-          child.setParent(pq);
-          child.setG(temp_g);
-          child.setF(temp_f);
-
-          if(openList.contains(child)){
-            openList.remove(child);
-          }
-          openList.add(child);
+        // If successor is in the closedList or newer f is lower
+        if((closedList.contains(successor)) && (temp_f > successor.getF())) {
+          successor.setParent(pq);
+          successor.setG(temp_g);
+          successor.setF(temp_f);
+        }
+        else{
+          openList.add(successor);
         }
       }
+      // Put pq on the closedList
+      closedList.add(pq);
     }
   }
 }
