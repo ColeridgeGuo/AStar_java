@@ -4,8 +4,8 @@ public class Node{
   private double g; // cost so far
   private double h; // heuristic cost to destination
   private double f; // estimated total cost of path
-  private double latitude;
-  private double longitude;
+  private final double latitude;
+  private final double longitude;
   public Edge[] adjacencies;
   private Node parent;
 
@@ -14,6 +14,8 @@ public class Node{
     this.latitude = latitude;
     this.longitude = longitude;
     this.h = -1;
+    this.g = 0;
+    this.f = 0;
   }
 
   public String getNodeID() {
@@ -31,8 +33,12 @@ public class Node{
     return h;
   }
   public void setH(Node d) {
-    this.h = Math.sqrt(Math.pow(this.latitude - d.latitude, 2) + Math.pow
-            (this.longitude - d.longitude, 2));
+    this.h = findDistance(d);
+  }
+
+  public double findDistance(Node n){
+    return Math.sqrt(Math.pow(this.latitude - n.latitude, 2) + Math.pow(this
+            .longitude - n.longitude, 2));
   }
 
   public double getF() {

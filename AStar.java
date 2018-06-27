@@ -14,30 +14,30 @@ public class AStar {
     //initialize the edges
     //A
     nodeA.adjacencies = new Edge[]{
-            new Edge(nodeB,10),
-            new Edge(nodeD,100)
+            new Edge(nodeB,nodeA.findDistance(nodeB)),
+            new Edge(nodeD,nodeA.findDistance(nodeD))
     };
     //B
     nodeB.adjacencies = new Edge[]{
-            new Edge(nodeA,10),
-            new Edge(nodeC,10)
+            new Edge(nodeA,nodeB.findDistance(nodeA)),
+            new Edge(nodeC,nodeB.findDistance(nodeC))
     };
     //C
     nodeC.adjacencies = new Edge[]{
-            new Edge(nodeB,10),
-            new Edge(nodeD,10),
-            new Edge(nodeE, 30)
+            new Edge(nodeB,nodeC.findDistance(nodeB)),
+            new Edge(nodeD,nodeC.findDistance(nodeD)),
+            new Edge(nodeE, nodeC.findDistance(nodeE))
     };
     //D
     nodeD.adjacencies = new Edge[]{
-            new Edge(nodeA,100),
-            new Edge(nodeE,10),
-            new Edge(nodeC,10),
+            new Edge(nodeA,nodeD.findDistance(nodeA)),
+            new Edge(nodeE,nodeD.findDistance(nodeE)),
+            new Edge(nodeC,nodeD.findDistance(nodeC)),
     };
     //E
     nodeE.adjacencies = new Edge[]{
-            new Edge(nodeD,10),
-            new Edge(nodeC,30)
+            new Edge(nodeD,nodeE.findDistance(nodeD)),
+            new Edge(nodeC,nodeE.findDistance(nodeC))
     };
 
     AStarSearch(nodeA,nodeE);
@@ -69,10 +69,9 @@ public class AStar {
         if (j.getF() > i.getF()) return -1;
         return 0;
       }
-    }
-    );
-    source.setG(0);
-    source.setF(0);
+    });
+    //source.setG(0);
+    //source.setF(0);
     openList.add(source);
 
     // While the openList is not empty and not GOOOOOOOOOAL
@@ -91,9 +90,8 @@ public class AStar {
 
       // Check every child of pq node
       for(Edge e : pq.adjacencies){
-        Node child = e.target;
-        double cost = e.cost;
-        double temp_g = pq.getG() + cost;
+        Node child = e.getTarget();
+        double temp_g = pq.getG() + e.getCost();
         double temp_f = temp_g + child.getH();
 
         // If successor is in the openList and the newer f is higher, skip
