@@ -5,39 +5,37 @@ public class AStar {
   public static void main(String[] args){
 
     //initialize the graph
-    Node nodeA = new Node("A", 32, -82);
-    Node nodeB = new Node("B", 32, -82);
-    Node nodeC = new Node("C", 32, -82);
-    Node nodeD = new Node("D", 32, -82);
-    Node nodeE = new Node("E", 32, -82);
+    Node nodeA = new Node("A", 34.92403214, -82.43865505);
+    Node nodeB = new Node("B", 34.92393383, -82.43849192);
+    Node nodeC = new Node("C", 34.9238696, -82.43839111);
+    Node nodeD = new Node("D", 34.92369055, -82.4380996);
+    Node nodeE = new Node("E", 34.92359738, -82.43819648);
+    Node nodeF = new Node("F", 34.92386961, -82.43774778);
 
     //initialize the edges
-    //A
     nodeA.adjacencies = new Edge[]{
-            new Edge(nodeB,10),
-            new Edge(nodeD,100)
+            new Edge(nodeB, nodeA.findDistance(nodeB)),
+            new Edge(nodeF, nodeA.findDistance(nodeF))
     };
-    //B
     nodeB.adjacencies = new Edge[]{
-            new Edge(nodeA,10),
-            new Edge(nodeC,10)
+            new Edge(nodeA, nodeB.findDistance(nodeA)),
+            new Edge(nodeC, nodeB.findDistance(nodeC))
     };
-    //C
     nodeC.adjacencies = new Edge[]{
-            new Edge(nodeB,10),
-            new Edge(nodeD,10),
-            new Edge(nodeE, 30)
+            new Edge(nodeB, nodeC.findDistance(nodeB)),
+            new Edge(nodeD, nodeC.findDistance(nodeD))
     };
-    //D
     nodeD.adjacencies = new Edge[]{
-            new Edge(nodeA,100),
-            new Edge(nodeE,10),
-            new Edge(nodeC,10),
+            new Edge(nodeE, nodeD.findDistance(nodeE)),
+            new Edge(nodeC, nodeD.findDistance(nodeC))
     };
-    //E
     nodeE.adjacencies = new Edge[]{
-            new Edge(nodeD,10),
-            new Edge(nodeC,30)
+            new Edge(nodeD, nodeE.findDistance(nodeD)),
+            new Edge(nodeF, nodeE.findDistance(nodeF))
+    };
+    nodeF.adjacencies = new Edge[]{
+            new Edge(nodeA, nodeF.findDistance(nodeA)),
+            new Edge(nodeE, nodeF.findDistance(nodeE))
     };
 
     AStarSearch(nodeA,nodeE);
@@ -71,8 +69,8 @@ public class AStar {
       }
     }
     );
-    source.setG(0);
-    source.setF(0);
+    //source.setG(0);
+    //source.setF(0);
     openList.add(source);
 
     // While the openList is not empty and not GOOOOOOOOOAL
@@ -91,9 +89,8 @@ public class AStar {
 
       // Check every child of pq node
       for(Edge e : pq.adjacencies){
-        Node child = e.target;
-        double cost = e.cost;
-        double temp_g = pq.getG() + cost;
+        Node child = e.getTarget();
+        double temp_g = pq.getG() + e.getCost();
         double temp_f = temp_g + child.getH();
 
         // If successor is in the openList and the newer f is higher, skip
