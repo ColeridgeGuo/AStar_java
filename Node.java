@@ -4,16 +4,19 @@ public class Node{
   private double g; // cost so far
   private double h; // heuristic cost to destination
   private double f; // estimated total cost of path
-  private final double latitude;
-  private final double longitude;
+  // TODO: take out the initial values
+  private final double latitude = 0;
+  private final double longitude = 0;
   public Edge[] adjacencies;
   private Node parent;
 
-  public Node(String nodeID, double latitude, double longitude){
+  // TODO: take out the heuristic in the constructor
+  // TODO: add the lat/long doubles back in
+  public Node(String nodeID, int heuristic){
     this.nodeID = nodeID;
-    this.latitude = latitude;
-    this.longitude = longitude;
-    this.h = -1;
+//    this.latitude = latitude;
+//    this.longitude = longitude;
+    this.h = heuristic;
     this.g = 0;
     this.f = 0;
   }
