@@ -27,10 +27,13 @@ public class AStar {
     nodeC.adjacencies = new Edge[]{
             new Edge(nodeG, 3)
     };
+    
+    Node target = nodeG;
 
-    AStarSearch(nodeS,nodeG);
-    List<Node> path = printPath(nodeG);
+    AStarSearch(nodeS,target);
+    List<Node> path = printPath(target);
     System.out.println("Path: " + path);
+    System.out.println("Cost: " + target.getG());
   }
 
   private static List<Node> printPath(Node target){
@@ -53,32 +56,33 @@ public class AStar {
             Comparator<Node>(){
       //override compare method
       public int compare(Node i, Node j){
-        if (i.getF() > j.getF()) return 1;
-        if (j.getF() > i.getF()) return -1;
+        if (i.getG() > j.getG()) return 1;
+        if (j.getG() > i.getG()) return -1;
         return 0;
       }
     }
     );
-    //source.setG(0);
-    //source.setF(0);
     openList.add(source);
 
     // While the openList is not empty and not GOOOOOOOOOAL
     boolean found = false;
     while((!openList.isEmpty()) && (!found)){
+
       // Remove the node with the minimum f on the openList
       Node pq = openList.poll();
+
+      // If goal found
+      if(pq.getNodeID().equals(goal.getNodeID())){
+        found = true;
+        break;
+      }
 
       // Check every successor of pq node
       for(Edge e : pq.adjacencies){
         Node successor = e.getTarget();
         successor.setParent(pq);
-        // If goal found
-        if(successor.getNodeID().equals(goal.getNodeID())){
-          found = true;
-          goal = successor;
-        }
 
+        // Calculate g, h, f
         double temp_g = pq.getG() + e.getCost();
         successor.setG(temp_g);
 //        if (successor.getH() == -1){
