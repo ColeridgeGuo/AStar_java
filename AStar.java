@@ -5,11 +5,11 @@ public class AStar {
   public static void main(String[] args){
 
     //initialize the graph
-    Node nodeS = new Node("S", 7);
-    Node nodeA = new Node("A", 6);
-    Node nodeB = new Node("B", 2);
-    Node nodeC = new Node("C", 1);
-    Node nodeG = new Node("G", 0);
+    Node nodeS = new Node("S", 0, 0, 7);
+    Node nodeA = new Node("A", 0, 0, 6);
+    Node nodeB = new Node("B", 0 ,0, 2);
+    Node nodeC = new Node("C", 0, 0, 1);
+    Node nodeG = new Node("G", 0 ,0, 0);
 
     //initialize the edges
     nodeS.adjacencies = new Edge[]{
@@ -27,7 +27,7 @@ public class AStar {
     nodeC.adjacencies = new Edge[]{
             new Edge(nodeG, 3)
     };
-    
+
     Node target = nodeG;
 
     AStarSearch(nodeS,target);
