@@ -9,12 +9,11 @@ public class Node{
   public Edge[] adjacencies;
   private Node parent;
 
-  // TODO: take out the heuristic in the constructor
-  public Node(String nodeID, double latitude, double longitude, int heuristic){
+  public Node(String nodeID, double latitude, double longitude){
     this.nodeID = nodeID;
     this.latitude = latitude;
     this.longitude = longitude;
-    this.h = heuristic;
+    this.h = -1;
     this.g = 0;
     this.f = 0;
   }

@@ -2,8 +2,8 @@ public class Edge{
   private final double cost;
   private final Node otherEndpoint;
 
-  Edge(Node target, double cost){
-    this.otherEndpoint = target;
+  Edge(Node otherEndpoint, double cost){
+    this.otherEndpoint = otherEndpoint;
     this.cost = cost;
   }
 
@@ -11,7 +11,7 @@ public class Edge{
     return cost;
   }
 
-  public Node getTarget(){
+  public Node getOtherEndpoint(){
     return otherEndpoint;
   }
 }

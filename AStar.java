@@ -5,11 +5,11 @@ public class AStar {
   public static void main(String[] args){
 
     //initialize the graph
-    Node nodeS = new Node("S", 0, 0, 7);
-    Node nodeA = new Node("A", 0, 0, 6);
-    Node nodeB = new Node("B", 0 ,0, 2);
-    Node nodeC = new Node("C", 0, 0, 1);
-    Node nodeG = new Node("G", 0 ,0, 0);
+    Node nodeS = new Node("S", 34.92403214, -82.43865505);
+    Node nodeA = new Node("A", 34.92369055, -82.4380996);
+    Node nodeB = new Node("B", 34.92386961, -82.43774778);
+    Node nodeC = new Node("C", 34.9238696, -82.43839111);
+    Node nodeG = new Node("G", 34.92359738, -82.43819648);
 
     //initialize the edges
     nodeS.adjacencies = new Edge[]{
@@ -79,7 +79,7 @@ public class AStar {
 
       // Check every successor of pq node
       for(Edge e : pq.adjacencies){
-        Node successor = e.getTarget();
+        Node successor = e.getOtherEndpoint();
         successor.setParent(pq);
 
         // Calculate g, h, f
