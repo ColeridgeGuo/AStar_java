@@ -1,113 +1,156 @@
+package Astar;
+
 import java.util.*;
 
 public class AStar {
-  //h is the straight-line distance from the pq city to destination
-  public static void main(String[] args){
+	//count of explored nodes as crude measurement of algorithmic effort
+	static int count = 0;
+	
+	//h is the straight-line distance from the pq city to destination
+	public static void main(String[] args){
 
-    //initialize the graph
-    Node nodeS = new Node("S", 7);
-    Node nodeA = new Node("A", 6);
-    Node nodeB = new Node("B", 2);
-    Node nodeC = new Node("C", 1);
-    Node nodeG = new Node("G", 0);
+		//initialize the graph with heuristic TO THE GOAL node
+		Node nodeA = new Node("A", 2,3);
+		Node nodeB = new Node("B", 8,3);
+		Node nodeC = new Node("C", 2,7);
+		Node nodeD = new Node("D", 6,6);
+		Node nodeE = new Node("E", 8,7);
+		Node nodeF = new Node("F", 12,4);
+		Node nodeG = new Node("G", 12,9);
+		Node nodeX = new Node("X", -2,0);  //nowhere close
+		Node nodeCX = new Node("CX", 0,30); //nowhere close
 
-    //initialize the edges
-    nodeS.adjacencies = new Edge[]{
-            new Edge(nodeA, 1),
-            new Edge(nodeB, 4)
-    };
-    nodeA.adjacencies = new Edge[]{
-            new Edge(nodeB, 2),
-            new Edge(nodeC, 5),
-            new Edge(nodeG, 12)
-    };
-    nodeB.adjacencies = new Edge[]{
-            new Edge(nodeC, 2)
-    };
-    nodeC.adjacencies = new Edge[]{
-            new Edge(nodeG, 3)
-    };
-    
-    Node target = nodeG;
+		//initialize the edges
+		nodeA.adjacencies = new Edge[]{
+				new Edge(nodeA, nodeB),
+				new Edge(nodeA, nodeC),
+				new Edge(nodeA, nodeX)
+		};
+		nodeB.adjacencies = new Edge[]{
+				new Edge(nodeB, nodeA),
+				new Edge(nodeB, nodeD),
+				new Edge(nodeB, nodeE),
+				new Edge(nodeB, nodeX)
+		};
+		nodeC.adjacencies = new Edge[]{
+				new Edge(nodeC, nodeA),
+				new Edge(nodeC, nodeD),
+				new Edge(nodeC, nodeG),
+				new Edge(nodeC, nodeCX)
+		};
+		nodeD.adjacencies = new Edge[]{
+				new Edge(nodeD, nodeB),
+				new Edge(nodeD, nodeC),
+				new Edge(nodeD, nodeE),
 
-    AStarSearch(nodeS,target);
-    List<Node> path = printPath(target);
-    System.out.println("Path: " + path);
-    System.out.println("Cost: " + target.getG());
-  }
+		};
+		nodeE.adjacencies = new Edge[]{
+				new Edge(nodeE, nodeB),
+				new Edge(nodeE, nodeD),
+				new Edge(nodeE, nodeF),
 
-  private static List<Node> printPath(Node target){
-    List<Node> path = new ArrayList<Node>();
+		};
+		nodeF.adjacencies = new Edge[]{
+				new Edge(nodeF, nodeE),
+				new Edge(nodeF, nodeG),
+		};
+		nodeG.adjacencies = new Edge[]{
+				new Edge(nodeG, nodeF),
+				new Edge(nodeG, nodeC),
+		};
+		nodeX.adjacencies = new Edge[]{
+				new Edge(nodeX, nodeA),
+				new Edge(nodeX, nodeB),
+		};
+		nodeCX.adjacencies = new Edge[]{
+				new Edge(nodeCX, nodeC)
+		};
 
-    for(Node node = target; node!=null; node = node.getParent()){
-      path.add(node);
-    }
-    Collections.reverse(path);
-    return path;
-  }
+		
+		//Mess with edge costs here
+		//nodeB.adjacencies[2].setCost(8);  //stairs cost??
+		//nodeE.adjacencies[0].setCost(8);
 
-  private static void AStarSearch(Node source, Node goal){
+		Node startNode = nodeA;
+		Node targetNode = nodeF;
 
-    //Initialize the closedList
-    Set<Node> closedList = new HashSet<Node>();
+		AStarSearch(startNode,targetNode);
+		List<Node> path = printPath(targetNode);
+		System.out.println("Path: " + path);
+		System.out.println("Cost: " + targetNode.getG() + " : "+count);
+	}
 
-    // Initialize the openList and put the starting node on the list
-    PriorityQueue<Node> openList = new PriorityQueue<Node>(11, new
-            Comparator<Node>(){
-      //override compare method
-      public int compare(Node i, Node j){
-        if (i.getG() > j.getG()) return 1;
-        if (j.getG() > i.getG()) return -1;
-        return 0;
-      }
-    }
-    );
-    openList.add(source);
+	//follow path from end, via parent's back to start
+	private static List<Node> printPath(Node target){
+		List<Node> path = new ArrayList<Node>();
 
-    // While the openList is not empty and not GOOOOOOOOOAL
-    boolean found = false;
-    while((!openList.isEmpty()) && (!found)){
+		for(Node node = target; node != null; node = node.getParent()){
+			path.add(node);
+		}
+		Collections.reverse(path);
+		return path;
+	}
 
-      // Remove the node with the minimum f on the openList
-      Node pq = openList.poll();
+	/**
+	 * implements A* path finding algorithm
+	 * @param source -starting node
+	 * @param goal -target node
+	 */
+	private static void AStarSearch(Node source, Node goal){
+		//Initialize the closedList - list of nodes that have been explored
+		Set<Node> closedList = new HashSet<Node>();
 
-      // If goal found
-      if(pq.getNodeID().equals(goal.getNodeID())){
-        found = true;
-        break;
-      }
+		// Initialize the openList of yet-to-be explored nodes
+		PriorityQueue<Node> openList = new PriorityQueue<Node>(20, new
+				Comparator<Node>(){
+					//Setup the compare method
+					public int compare(Node i, Node j){
+						if (i.getF() > j.getF()) return 1;
+						if (j.getF() > i.getF()) return -1;
+						return 0;
+						}
+				});
+	
+		openList.add(source);    //search starts at beginning
 
-      // Check every successor of pq node
-      for(Edge e : pq.adjacencies){
-        Node successor = e.getTarget();
-        successor.setParent(pq);
+		// While connected nodes have remain to be explored
+		while((!openList.isEmpty()) ){
+			// Remove the node with the minimum f on the openList
+			Node pq = openList.poll();
 
-        // Calculate g, h, f
-        double temp_g = pq.getG() + e.getCost();
-        successor.setG(temp_g);
-//        if (successor.getH() == -1){
-//          successor.setH(goal);
-//        }
-        double temp_f = temp_g + successor.getH();
-        successor.setF(temp_f);
+			// If goal found
+			if(pq.getNodeID().equals(goal.getNodeID())){
+				break;
+			}
 
-        // If successor is in the openList and that node's f < successor.f, skip
-        if((openList.contains(successor)) && (temp_f <= successor.getF())){
-          continue;
-        }
+			// Check every successor of pq node
+			for(Edge e : pq.adjacencies){
+				Node successor = e.getOtherEnd(pq);
+	
+				// Calculate g, f
+				double temp_g = pq.getG() + e.getCost();       //actual cost so far
+				double temp_f = temp_g + successor.getH(goal); //estimated cost to target
 
-        // If successor is in the closedList or newer f is lower
-        if((closedList.contains(successor)) && (temp_f > successor.getF())) {
-          successor.setParent(pq);
-          successor.setG(temp_g);
-          successor.setF(temp_f);
-        }
-        else{
-          openList.add(successor);
-        }
-      }
-      // Put pq on the closedList
-      closedList.add(pq);
-    }
-  }
+				if (openList.contains(successor)) {  //two routes to this node exist
+					if (temp_f <= successor.getF()) {
+						//update cheaper route on the openList with new routing
+						successor.setParent(pq);
+						successor.setG(temp_g);
+						successor.setF(temp_f);
+						System.out.println("New route to "+successor+ "is via "+pq);
+					}
+				} else if (!closedList.contains(successor)) {  //b/c closedList is guaranteed cheapest route
+					///update this before putting on openlist
+					successor.setParent(pq);
+					successor.setG(temp_g);
+					successor.setF(temp_f);
+					System.out.println("OL add:"+successor+" @ "+successor.getF());
+					openList.add(successor);
+				}
+			}
+			// Put pq on the closedList
+			closedList.add(pq);
+			count++;
+		}
+	}
 }
